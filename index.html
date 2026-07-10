@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>LEFT 4 REGINA 2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Teko:wght@500&display=swap');
+
+        body {
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
+            color: #cccccc;
+            font-family: 'Oswald', sans-serif;
+            user-select: none;
+            position: relative;
+            background-color: #000;
+            box-sizing: border-box;
+        }
+
+        /* FONDO DEL JUEGO CON TU IMAGEN */
+        .background-container {
+            position: fixed; /* Cambiado a fixed para que el fondo no se mueva al hacer scroll */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .background-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.35) contrast(1.1) saturate(0.8); 
+        }
+
+        /* Capa de degradado oscuro de fondo */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+            z-index: -1;
+        }
+
+        /* Título del juego arriba a la izquierda */
+        .game-title {
+            font-size: 55px;
+            color: #ffffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0px #b01c1c;
+            margin-bottom: 30px;
+            font-family: 'Teko', sans-serif;
+            display: inline-block;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+            margin-top: 20px;
+            flex-wrap: wrap; /* Permite adaptarse mejor si se ve en pantallas móviles */
+        }
+
+        /* MARCO ADAPTABLE */
+        .photo-frame {
+            border: 8px solid #ffffff;
+            box-shadow: 5px 5px 25px rgba(0, 0, 0, 0.9);
+            width: fit-content;
+            height: fit-content;
+            max-width: 350px; 
+            background-color: transparent;
+            transform: rotate(-2deg);
+            position: relative;
+            display: flex;
+        }
+
+        .photo-frame img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px; 
+            object-fit: contain;
+            filter: sepia(0.15) contrast(1.1) brightness(0.9);
+            transition: opacity 0.15s ease-in-out;
+            display: block;
+        }
+
+        .photo-label {
+            position: absolute;
+            bottom: -35px;
+            left: 5px;
+            color: #ffffff;
+            font-size: 20px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px #000;
+            letter-spacing: 1px;
+        }
+
+        /* Menú de opciones */
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .menu-item {
+            font-size: 32px;
+            color: #999999;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            width: fit-content;
+        }
+
+        .menu-item:hover {
+            color: #ffffff;
+            transform: scale(1.03) translateX(12px);
+            text-shadow: 0 0 8px rgba(255,255,255,0.6), 2px 2px 0px #b01c1c;
+        }
+
+        .menu-description {
+            font-size: 14px;
+            color: #777777;
+            font-family: Arial, sans-serif;
+            margin-top: -8px;
+            max-width: 450px;
+            line-height: 1.4;
+        }
+
+        /* CONTENEDOR INTERNO: Ahora permite hacer scroll si el texto es muy largo */
+        .section-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0c0c0c;
+            overflow-y: auto; /* ¡AQUÍ ACTIVA EL DESPLAZAMIENTO PARA TELÉFONOS Y MOUSE! */
+            padding: 40px;
+            box-sizing: border-box;
+            z-index: 10;
+            display: none; /* Se activa mediante JS */
+        }
+
+        .section-content {
+            max-width: 800px;
+            margin: 20px auto;
+            font-family: 'Oswald', sans-serif;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .section-title {
+            font-size: 45px;
+            color: #ffffff;
+            text-shadow: 2px 2px #000000, 2px 2px 0px #b01c1c;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .section-line {
+            border: none;
+            height: 3px;
+            background-color: #b01c1c;
+            margin-bottom: 30px;
+        }
+
+        .section-text {
+            font-size: 22px;
+            color: #dddddd;
+            line-height: 1.7;
+            font-family: Arial, sans-serif;
+        }
+
+        .btn-back {
+            margin-top: 45px;
+            background: #b01c1c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0px #500b0b;
+            transition: 0.1s;
+            margin-bottom: 40px; /* Espacio extra abajo del botón para que no quede pegado al borde */
+        }
+
+        .btn-back:hover {
+            background: #d42424;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-container">
+        <img src="fondo.jpg" alt="Fondo L4D2">
+        <div class="overlay"></div>
+    </div>
+
+    <div id="main-menu">
+        <div class="game-title">LEFT 4 REGINA 2</div>
+
+        <div class="main-container">
+            <div class="photo-frame">
+                <img id="survivor-photo" src="foto1.jpg" alt="Supervivientes">
+                <div class="photo-label">Los Favoritos</div>
+            </div>
+
+            <div class="menu-list">
+                <div class="menu-item" onmouseover="cambiarFoto('foto1.jpg')" onclick="irA('campana')">Nuestra Campaña</div>
+                <div class="menu-description">Entra a ver lo feliz que me haces y el futuro que sueño contigo.</div>
+
+                <div class="menu-item" onmouseover="cambiarFoto('foto2.jpg')" onclick="irA('cartitas')">Mutaciones (Cartitas)</div>
+                <div class="menu-description">Pequeños manuscritos de amor que cambian las reglas del juego.</div>
+
+                <div class="menu-item" onmouseover="cambiarFoto('foto3.jpg')" onclick="irA('musica')">Realismo (Música)</div>
+                <div class="menu-description">La banda sonora de nuestra supervivencia juntos.</div>
+
+                <div class="menu-item" onmouseover="cambiarFoto('foto4.jpg')" onclick="irA('minijuego')">Versus (Minijuego)</div>
+                <div class="menu-description">Un reto especial solo para ti, mi jugadora favorita.</div>
+
+                <div class="menu-item" onmouseover="cambiarFoto('foto5.jpg')" onclick="irA('extras')">Extras</div>
+                <div class="menu-description">Una sorpresa confidencial que se desbloquea al final.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-view" class="section-wrapper">
+        <div id="section-dynamic-content"></div>
+    </div>
+
+    <script>
+        function cambiarFoto(nombreArchivo) {
+            const foto = document.getElementById('survivor-photo');
+            foto.style.opacity = '0.3';
+            
+            setTimeout(() => {
+                foto.src = nombreArchivo; 
+                foto.style.opacity = '1';
+            }, 100);
+        }
+
+        function irA(seccion) {
+            const menu = document.getElementById('main-menu');
+            const view = document.getElementById('section-view');
+            const dynamicContent = document.getElementById('section-dynamic-content');
+            
+            let contenidoHTML = '';
+
+            if (seccion === 'campana') {
+                contenidoHTML = `
+                    <div class="section-content">
+                        <h1 class="section-title">Campaña: El inicio de nuestro viaje</h1>
+                        <div class="section-line"></div>
+                        <div class="section-text">
+                            <p>Amor de mi vida, hoy me quedé pensando en lo increíblemente afortunado que soy de tenerte cerca. Desde aquel 23 de abril que empezamos este viaje juntos, mi mundo cambió por completo. Tu compañía es, sin duda alguna, lo más hermoso y valioso que me ha pasado en la vida.</p>
+                            <p>Me haces inmensamente feliz, mi niña chiquita. Eres mi vida entera, mi motivación de todos los días y mi compañera ideal para superar cualquier nivel por más difícil que parezca. Cada día que pasa a tu lado tengo más claro que mi mayor sueño no es solo disfrutar el presente contigo, sino construir un futuro sólido, lleno de metas compartidas, risas infinitas y, eventualmente, una hermosa familia a tu lado.</p>
+                            <p>Eres mi lugar seguro en medio de cualquier tormenta, mi refugio cuando todo lo demás es un caos. Gracias por amarme, por tu paciencia, por tus abrazos y por hacer que cada momento juntos se sientas como nuestra mejor victoria. Te amo con todo mi corazón. ❤️</p>
+                        </div>
+                        <button class="btn-back" onclick="regresarAlMenu()">Volver al Menú</button>
+                    </div>`;
+            } else if (seccion === 'cartitas') {
+                contenidoHTML = `
+                    <div class="section-content">
+                        <h1 class="section-title">Mutaciones: Mis Cartitas para ti</h1>
+                        <div class="section-line"></div>
+                        <div class="section-text">
+                            <p>¡Bienvenida al modo de Mutaciones, Tutuguita! Aquí las reglas del juego cambian porque mi amor por ti no es algo estático; muta, crece y se reinventa cada mañana para hacerse muchísimo más grande y fuerte de lo que era el día anterior.</p>
+                            <p>Quiero dejarte estos pequeños manuscritos de amor para que los leas cada vez que necesites recordar lo mucho que significas para mí. Eres una niña maravillosa, inteligente, hermosa y con un corazón enorme. Me encanta la forma en que me miras, cómo me haces sonreír con tus ocurrencias y la paz que me transmites con solo tomar mi mano. No importa qué tan complicado se ponga el día, sé que si tengo un mensaje tuyo o la promesa de verte, todo va a estar bien.</p>
+                            <p>Eres mi jugadora favorita en este mundo y quiero que sepas que siempre voy a estar aquí para cuidarte, apoyarte en tus proyectos y recordarte lo valiosa que eres. ¡Estás equipada con todo mi amor para ganar cualquier batalla! 📜✨</p>
+                        </div>
+                        <button class="btn-back" onclick="regresarAlMenu()">Volver al Menú</button>
+                    </div>`;
+            } else if (seccion === 'musica') {
+                contenidoHTML = `
+                    <div class="section-content">
+                        <h1 class="section-title">Realismo: La Banda Sonora</h1>
+                        <div class="section-line"></div>
+                        <div class="section-text">
+                            <p>En el modo Realismo no hay mapas, no hay siluetas que nos guíen y no hay ayudas en la pantalla; todo depende de nuestra sincronización y de la confianza mutua. Y en medio de esa intensidad, lo único que se escucha de fondo es nuestra propia banda sonora, la música que le da sentido a nuestra historia.</p>
+                            <p>Cada canción que escuchamos juntos o que me recuerda a ti se convierte en un refugio. Me pongo a pensar en la letra de "Besos" de Los Paros Cardíacos y no puedo evitar sonreír porque describe perfectamente lo que siento cuando te tengo cerca y lo mucho que anhelo tus abrazos. La música tiene ese superpoder: viaja en el tiempo y me transporta directamente a esos momentos en los que nos olvidamos del resto del mundo y solo existimos tú y yo.</p>
+                            <p>Nuestra supervivencia no es cuestión de suerte, es cuestión de ritmo. Mientras sigamos bailando y escuchando las mismas melodías, no hay horda ni dificultad en este mundo que pueda separarnos. ¡Eres mi canción favorita repetida en bucle infinito! 🎵🎧</p>
+                        </div>
+                        <button class="btn-back" onclick="regresarAlMenu()">Volver al Menú</button>
+                    </div>`;
+            } else if (seccion === 'minijuego') {
+                contenidoHTML = `
+                    <div class="section-content">
+                        <h1 class="section-title">Versus: Modo Supervivencia Activo</h1>
+                        <div class="section-line"></div>
+                        <div class="section-text">
+                            <p>¡Atención, Pinguinita! Has entrado formalmente a la sección de Versus, donde la adrenalina sube y el reto se vuelve completamente interactivo. Pero en nuestro tablero de juego las reglas son un poquito diferentes: aquí el rival soy yo, pero en lugar de atacarnos, competimos para ver quién logra llenar de más detalles, mimos y amor al otro.</p>
+                            <p>La pregunta del póster es real: ¿Quién aguantará más? ¿Quién será el primero en dar un abrazo sorpresa? ¿Quién dirá el "te amo" más sincero de la tarde? Prepárate bien, mi niña chiquita, porque pienso dar pelea y llenarte de muchísimo amor, besos y recordatorios de lo hermosa que eres hasta que no te quede más opción que dejarte consentir.</p>
+                            <p>A final de cuentas, en este Versus el marcador no importa porque si tú ganas, gano yo, y si quedamos empatados significa que estamos construyendo el mejor equipo del mundo. ¡Que empiece la partida, Mugosha! 🎮⚔️</p>
+                        </div>
+                        <button class="btn-back" onclick="regresarAlMenu()">Volver al Menú</button>
+                    </div>`;
+            } else if (seccion === 'extras') {
+                contenidoHTML = `
+                    <div class="section-content">
+                        <h1 class="section-title">Extras: Contenido Confidencial</h1>
+                        <div class="section-line"></div>
+                        <div class="section-text">
+                            <p>¡Felicidades! Has desbloqueado la sección más exclusiva y secreta de todo el sistema. Este espacio está reservado únicamente para los supervivientes de élite, esos que han demostrado tener un nivel de lealtad, ternura y compañerismo fuera de este planeta. En resumen: un lugar hecho exclusivamente para ti, Degis.</p>
+                            <p>Este es nuestro baúl de los recuerdos confidenciales. Aquí se guardan todas esas bromas locales que solo nosotros entendemos, las fotitos que nos tomamos cuando nadie nos ve, las risas cómplices y los pequeños secretos que hacen que nuestra relación sea única y mágica. Es el premio definitivo por ser la mejor compañera de equipo que la vida me pudo haber regalado.</p>
+                            <p>Gracias por ser mi cómplice en cada locura, por seguirme el juego con estos proyectos y por hacer que la vida se sienta como una aventura increíble todos los días. ¡Tu pase VIP a mi corazón está desbloqueado para siempre! 🏆🔒</p>
+                        </div>
+                        <button class="btn-back" onclick="regresarAlMenu()">Volver al Menú</button>
+                    </div>`;
+            }
+
+            dynamicContent.innerHTML = contenidoHTML;
+            menu.style.display = 'none';
+            view.style.display = 'block';
+            view.scrollTop = 0; // Reinicia el scroll arriba al abrir una nueva sección
+        }
+
+        function regresarAlMenu() {
+            document.getElementById('main-menu').style.display = 'block';
+            document.getElementById('section-view').style.display = 'none';
+        }
+
+        window.addEventListener('keydown', function(event) {
+            if (event.code === 'Space') {
+                // Solo activa la campaña si el menú principal está visible
+                if (document.getElementById('main-menu').style.display !== 'none') {
+                    event.preventDefault();
+                    irA('campana');
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
